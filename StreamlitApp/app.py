@@ -36,7 +36,7 @@ GEMINI_KEY = st.secrets["GEMINI_API_KEY"]
 # -------------------------------------------------
 # 3️⃣ LOAD DATA & MODELS
 # -------------------------------------------------
-DATA_FILE = "smart_manufacturing_data_latest.csv.gz"
+DATA_FILE = "StreamlitApp/smart_manufacturing_data_latest.csv.gz"
 
 @st.cache_data
 def load_data():
@@ -194,3 +194,4 @@ with st.sidebar:
 **Goal:**  
 Enable plant managers to make fast, confident maintenance decisions.
 """)
+
