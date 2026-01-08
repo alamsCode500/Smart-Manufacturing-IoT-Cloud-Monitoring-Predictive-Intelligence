@@ -206,3 +206,10 @@ Data Scientist | IoT | Machine Learning | Generative AI
 ## ⭐ Final Note
 
 This project demonstrates how ML + GenAI + Streamlit can transform raw IoT data into business intelligence that anyone can understand.
+
+## UI Look:
+
+<img width="1920" height="1324" alt="Streamlit_UI" src="https://github.com/user-attachments/assets/0333aabf-918d-48ba-915d-b48e1085f9bc" />
+
+<img width="1920" height="1327" alt="Streamlit_UI_2" src="https://github.com/user-attachments/assets/8241945f-dcb6-4823-b525-9fea191a9c05" />
+
