@@ -51,22 +51,39 @@ We built a Predictive Intelligence System that:
 ## 🏗️ End-to-End Architecture
 
 IoT Sensors
+
      ↓
+
 Cloud Data Storage
+
      ↓
+
 Data Processing & Feature Engineering
+
      ↓
+
 ML Models
+
   • Predictive Maintenance
+  
   • Anomaly Detection (Isolation Forest)
+  
      ↓
+
 ML Outputs (Risk + Anomaly Flags)
+
      ↓
+
 GenAI (Gemini)
+
   • Explain risks
+  
   • Recommend actions
+  
      ↓
+
 Streamlit Web App
+
   • Interactive chatbot interface
 
 
@@ -124,14 +141,23 @@ Streamlit Web App
 ## 📁 Project Structure
 
 DS03-Smart-Manufacturing/
+
 │
+
 ├── StreamlitApp/
+
 │   ├── app.py
+
 │   ├── smart_manufacturing_data_latest.csv.gz
+
 │   ├── final_predictive_maintenance_model.pkl
+
 │   ├── scaler.pkl
+
 ├── DS03_Smart_Manufacturing_IoT_Cloud_Monitoring_&_Predictive_Intelligence.ipynb
+
 ├── smart_manufacturing_data.csv
+
 ├── README.md
 
 ## 🚀 Deployment
