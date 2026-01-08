@@ -28,8 +28,8 @@ st.markdown(
 # 2️⃣ GEMINI API CONFIG (REST)
 # -------------------------------------------------
 if "GEMINI_API_KEY" not in st.secrets:
-    st.error("❌ GEMINI_API_KEY not found in Streamlit secrets.")
-    st.stop()
+    #st.error("❌ GEMINI_API_KEY not found in Streamlit secrets.")
+    #st.stop()
 
 GEMINI_KEY = st.secrets["GEMINI_API_KEY"]
 
@@ -196,6 +196,7 @@ with st.sidebar:
 **Goal:**  
 Enable plant managers to make fast, confident maintenance decisions.
 """)
+
 
 
 
