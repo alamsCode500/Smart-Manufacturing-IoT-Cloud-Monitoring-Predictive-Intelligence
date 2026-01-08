@@ -47,8 +47,8 @@ def load_data():
 
 @st.cache_resource
 def load_models():
-    model = joblib.load("final_predictive_maintenance_model.pkl")
-    scaler = joblib.load("scaler.pkl")
+    model = joblib.load("StreamlitApp/final_predictive_maintenance_model.pkl")
+    scaler = joblib.load("StreamlitApp/scaler.pkl")
     return model, scaler
 
 df = load_data()
@@ -194,4 +194,5 @@ with st.sidebar:
 **Goal:**  
 Enable plant managers to make fast, confident maintenance decisions.
 """)
+
 
