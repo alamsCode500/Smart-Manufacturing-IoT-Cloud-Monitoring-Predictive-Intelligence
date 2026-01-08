@@ -213,3 +213,6 @@ This project demonstrates how ML + GenAI + Streamlit can transform raw IoT data 
 
 <img width="1920" height="1327" alt="Streamlit_UI_2" src="https://github.com/user-attachments/assets/8241945f-dcb6-4823-b525-9fea191a9c05" />
 
+<img width="1920" height="1264" alt="Streamlit_UI_3" src="https://github.com/user-attachments/assets/1a7b13b5-5ae9-40d1-9c3e-c1575a4126bf" />
+
+
