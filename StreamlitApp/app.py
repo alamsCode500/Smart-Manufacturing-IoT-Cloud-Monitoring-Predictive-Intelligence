@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import joblib
 import requests
+import os
 from datetime import datetime
 
 # -------------------------------------------------
@@ -35,9 +36,14 @@ GEMINI_KEY = st.secrets["GEMINI_API_KEY"]
 # -------------------------------------------------
 # 3️⃣ LOAD DATA & MODELS
 # -------------------------------------------------
+DATA_FILE = "smart_manufacturing_data_latest.csv.gz"
+
 @st.cache_data
 def load_data():
-    return pd.read_csv("smart_manufacturing_data_latest.csv.gz")
+    if not os.path.exists(DATA_FILE):
+        st.error("❌ Dataset file not found. Please check deployment.")
+        st.stop()
+    return pd.read_csv(DATA_FILE)
 
 @st.cache_resource
 def load_models():
@@ -54,23 +60,21 @@ ml_model, scaler = load_models()
 def build_ml_context(machine_id: str, df: pd.DataFrame) -> str:
     row = df[df["machine_id"] == machine_id].iloc[-1]
 
-    failure_risk = "High" if row["maintenance_required"] == 1 else "Low"
-    anomaly = "Yes" if row.get("anomaly_flag_pred", 0) == 1 else "No"
+    failure_risk = "High" if int(row["maintenance_required"]) == 1 else "Low"
+    anomaly = "Yes" if int(row.get("anomaly_flag_pred", 0)) == 1 else "No"
 
-    context = f"""
-    Machine ID: {machine_id}
-    Timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
+    return f"""
+Machine ID: {machine_id}
+Timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
 
-    Predictive Maintenance Results:
-    - Failure Risk Level: {failure_risk}
-    - Anomaly Detected: {anomaly}
+Predictive Maintenance Results:
+- Failure Risk Level: {failure_risk}
+- Anomaly Detected: {anomaly}
 
-    Rules:
-    - High risk means maintenance may be required soon.
-    - Anomaly means abnormal sensor behavior was detected.
-    """
-
-    return context.strip()
+Rules:
+- High risk means maintenance may be required soon.
+- Anomaly means abnormal sensor behavior was detected.
+""".strip()
 
 # -------------------------------------------------
 # 5️⃣ GENAI SYSTEM PROMPT
@@ -93,27 +97,26 @@ def genai_answer(machine_id: str, user_question: str, df: pd.DataFrame) -> str:
     context = build_ml_context(machine_id, df)
 
     user_prompt = f"""
-    MACHINE DATA:
-    {context}
+MACHINE DATA:
+{context}
 
-    USER QUESTION:
-    "{user_question}"
+USER QUESTION:
+"{user_question}"
 
-    Answer using:
-    1. What is happening
-    2. Why it matters
-    3. Recommended action
-    """
+Answer using:
+1. What is happening
+2. Why it matters
+3. Recommended action
+"""
 
-    api_url = f"https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent?key={GEMINI_KEY}"
+    api_url = (
+        "https://generativelanguage.googleapis.com/v1/models/"
+        f"gemini-2.5-flash:generateContent?key={GEMINI_KEY}"
+    )
 
     payload = {
         "contents": [
-            {
-                "parts": [
-                    {"text": SYSTEM_PROMPT + "\n\n" + user_prompt}
-                ]
-            }
+            {"parts": [{"text": SYSTEM_PROMPT + "\n\n" + user_prompt}]}
         ],
         "generationConfig": {
             "temperature": 0.2,
@@ -121,22 +124,12 @@ def genai_answer(machine_id: str, user_question: str, df: pd.DataFrame) -> str:
         }
     }
 
-    headers = {"Content-Type": "application/json"}
-
     try:
-        response = requests.post(
-            api_url,
-            json=payload,
-            headers=headers,
-            timeout=60
-        )
-        response.raise_for_status()
-        result = response.json()
-
-        return result["candidates"][0]["content"]["parts"][0]["text"]
-
-    except Exception as e:
-        return f"❌ GenAI response failed: {e}"
+        r = requests.post(api_url, json=payload, timeout=60)
+        r.raise_for_status()
+        return r.json()["candidates"][0]["content"]["parts"][0]["text"]
+    except Exception:
+        return "⚠️ Unable to generate explanation at the moment. Please try again."
 
 # -------------------------------------------------
 # 7️⃣ STREAMLIT UI
@@ -151,11 +144,11 @@ with col1:
 
     st.markdown("#### Example Questions")
     st.markdown("""
-    - Which machines are at risk today?
-    - Why is this machine flagged?
-    - What action is recommended?
-    - Is immediate maintenance required?
-    """)
+- Which machines are at risk today?
+- Why is this machine flagged?
+- What action is recommended?
+- Is immediate maintenance required?
+""")
 
 with col2:
     user_question = st.text_input(
@@ -164,7 +157,7 @@ with col2:
     )
 
     if st.button("Ask GenAI Assistant"):
-        if not user_question:
+        if not user_question.strip():
             st.warning("Please enter a question.")
         else:
             with st.spinner("Analyzing machine health..."):
@@ -174,45 +167,30 @@ with col2:
             st.markdown(answer)
 
 # -------------------------------------------------
-# 8️⃣ RAW ML OUTPUT (TRANSPARENCY)
-# -------------------------------------------------  
+# 8️⃣ RAW ML STATUS (HUMAN-READABLE)
+# -------------------------------------------------
 with st.expander("🔎 View Raw ML Status"):
     latest = df[df["machine_id"] == selected_machine].iloc[-1]
 
-    maintenance_text = (
-        "Maintenance Required"
-        if int(latest["maintenance_required"]) == 1
-        else "No Maintenance Required"
-    )
-
-    anomaly_text = (
-        "Anomaly Detected"
-        if int(latest.get("anomaly_flag_pred", 0)) == 1
-        else "No Anomaly Detected"
-    )
-
     st.markdown(f"""
-    **Machine ID:** {selected_machine}  
-
-    **Maintenance Status:** {maintenance_text}  
-
-    **Anomaly Status:** {anomaly_text}
-    """)
-
+**Machine ID:** {selected_machine}  
+**Maintenance Status:** {"Maintenance Required" if latest["maintenance_required"] == 1 else "No Maintenance Required"}  
+**Anomaly Status:** {"Anomaly Detected" if latest.get("anomaly_flag_pred", 0) == 1 else "No Anomaly Detected"}
+""")
 
 # -------------------------------------------------
-# 9️⃣ SIDEBAR PROJECT INFO
+# 9️⃣ SIDEBAR
 # -------------------------------------------------
 with st.sidebar:
     st.header("📌 Project Info")
     st.markdown("""
-    **DS03: Smart Manufacturing**
+**DS03: Smart Manufacturing**
 
-    - IoT Sensor Monitoring  
-    - Predictive Maintenance (ML)  
-    - GenAI Explanation Layer  
-    - Streamlit Deployment  
+- IoT Sensor Monitoring  
+- Predictive Maintenance (ML)  
+- GenAI Explanation Layer  
+- Streamlit Deployment  
 
-    **Goal:**  
-    Enable plant managers to take fast, informed maintenance decisions.
-    """)
+**Goal:**  
+Enable plant managers to make fast, confident maintenance decisions.
+""")
