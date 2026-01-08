@@ -109,10 +109,12 @@ Answer using:
 3. Recommended action
 """
 
-    api_url = (
-        "https://generativelanguage.googleapis.com/v1/models/"
-        f"gemini-2.5-flash:generateContent?key={GEMINI_KEY}"
-    )
+    #api_url = (
+     #   "https://generativelanguage.googleapis.com/v1/models/"
+      #  f"gemini-2.5-flash:generateContent?key={GEMINI_KEY}"
+    #)
+
+    api_url = f"https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent?key={GEMINI_KEY}"
 
     payload = {
         "contents": [
@@ -194,5 +196,6 @@ with st.sidebar:
 **Goal:**  
 Enable plant managers to make fast, confident maintenance decisions.
 """)
+
 
 
