@@ -37,12 +37,12 @@ GEMINI_KEY = st.secrets["GEMINI_API_KEY"]
 # -------------------------------------------------
 @st.cache_data
 def load_data():
-    return pd.read_csv("smart_manufacturing_data_latest.csv.gz")
+    return pd.read_csv("StreamlitApp/smart_manufacturing_data_latest.csv.gz")
 
 @st.cache_resource
 def load_models():
-    model = joblib.load("final_predictive_maintenance_model.pkl")
-    scaler = joblib.load("scaler.pkl")
+    model = joblib.load("StreamlitApp/final_predictive_maintenance_model.pkl")
+    scaler = joblib.load("StreamlitApp/scaler.pkl")
     return model, scaler
 
 df = load_data()
@@ -216,3 +216,4 @@ with st.sidebar:
     **Goal:**  
     Enable plant managers to take fast, informed maintenance decisions.
     """)
+
